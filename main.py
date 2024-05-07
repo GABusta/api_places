@@ -39,20 +39,18 @@ def save_to_csv(places, filename):
             writer.writerow([name, website, address, lat, lng])
 
 
+if "__name__" == "__main__":
+    locations = [
+        ("-34.603722,-58.381592", "Buenos Aires")
+    ]
 
-# ----------------------------------------------------------------
-# List of locations for different states in Argentina
-locations = [
-    ("-34.603722,-58.381592", "Buenos Aires")
-]
+    api_key = os.getenv("API_KEY")
 
-api_key = os.getenv("API_KEY")
-
-for location, state in locations:
-    print(f"Searching in {state}...")
-    vet_clinics = find_vet_clinics(api_key, location, term="veterinaria")
-    if vet_clinics:
-        save_to_csv(vet_clinics, f"vet_clinics_{state.replace(' ', '_')}.csv")
-        print(f"Data for {state} saved.")
-    else:
-        print(f"No data found for {state}.")
+    for location, state in locations:
+        print(f"Searching in {state}...")
+        vet_clinics = find_vet_clinics(api_key, location, term="veterinaria")
+        if vet_clinics:
+            save_to_csv(vet_clinics, f"vet_clinics_{state.replace(' ', '_')}.csv")
+            print(f"Data for {state} saved.")
+        else:
+            print(f"No data found for {state}.")
