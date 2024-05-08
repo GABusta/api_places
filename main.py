@@ -1,56 +1,65 @@
 import requests
 import json
-import csv
-import os 
+import os
+from save_to_file import save_to_csv
+from typing import List
 
 
-def find_vet_clinics(api_key, location, term="veterinary_care"):
+def get_place_details(api_key: str, place_id: str, fields: list):
+    details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+    params = {"key": api_key, "place_id": place_id, "fields": ",".join(fields)}
+    response = requests.get(details_url, params=params)
+    if response.status_code == 200:
+        detail_results = json.loads(response.text)
+        return detail_results.get("result", {})
+    else:
+        return {}
+
+
+def find_places(api_key: str, location: str, keyword: str, extra_fields: List[str]):
     endpoint_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     places = []
+
     params = {
         "key": api_key,
-        "location": location,  # latitude,longitude for the center of the search
+        "location": location,  # center latitude, longitude
         "radius": 50000,  # search radius in meters
-        "keyword": term  # additional search keyword
+        "keyword": keyword,
     }
 
     res = requests.get(endpoint_url, params=params)
     while res.status_code == 200:
         results = json.loads(res.text)
-        places.extend(results['results'])
+        for place in results["results"]:
+            # Fetch additional details
+            detailed_info = get_place_details(
+                api_key=api_key, place_id=place["place_id"], fields=extra_fields
+            )
+            place.update(detailed_info)
+            places.append(place)
+
+        # places.extend(results["results"])
         if "next_page_token" in results:
-            params['pagetoken'] = results['next_page_token']
+            params["pagetoken"] = results["next_page_token"]
             res = requests.get(endpoint_url, params=params)
             continue
         break
     return places
 
-def save_to_csv(places, filename):
-    with open(filename, mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Name', 'Website', 'Address', 'Latitude', 'Longitude'])
-        for place in places:
-            name = place.get('name', 'No Name')
-            website = place.get('website', 'No Website')
-            address = place.get('vicinity', 'No Address')
-            location = place.get('geometry', {}).get('location', {})
-            lat = location.get('lat', '')
-            lng = location.get('lng', '')
-            writer.writerow([name, website, address, lat, lng])
 
-
-if "__name__" == "__main__":
-    locations = [
-        ("-34.603722,-58.381592", "Buenos Aires")
-    ]
-
+if __name__ == "__main__":
     api_key = os.getenv("API_KEY")
 
+    query = "veterinaria"
+    extra_fields = ["formatted_phone_number", "website", "url", "address_component"]
+    locations = [("-34.603722,-58.381592", "Buenos Aires")]
+
     for location, state in locations:
-        print(f"Searching in {state}...")
-        vet_clinics = find_vet_clinics(api_key, location, term="veterinaria")
-        if vet_clinics:
-            save_to_csv(vet_clinics, f"vet_clinics_{state.replace(' ', '_')}.csv")
+        places_found = find_places(
+            api_key=api_key, location=location, keyword=query, extra_fields=extra_fields
+        )
+        if places_found:
+            save_to_csv(places_found, f"values_found{state.replace(' ', '_')}.csv")
             print(f"Data for {state} saved.")
         else:
             print(f"No data found for {state}.")
