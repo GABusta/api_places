@@ -78,12 +78,3 @@ def mesh_generation_file(model_name: str, size_element: float) -> None:
     gmsh.fltk.run()
     gmsh.finalize()
     
-
-if __name__ == "__main__":
-    model_name = "buenos_aires"
-    size_element = 0.15
-    
-    mesh_generation_file(
-        model_name=model_name,
-        size_element=size_element,
-        )
