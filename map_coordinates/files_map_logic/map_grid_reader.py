@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Use the non-GUI Agg backend
 import matplotlib.pyplot as plt
+from files_map_logic.object_bases import PhysicalEntitiesBase, GeometryBase, MeshingBase
 import os
 
 
@@ -10,11 +11,11 @@ class Mesh:
     Mesh Structure
     """
     def __init__(self):
-        self.physical_entities = {}
-        self.geometry = {}
-        self.meshing = {}
+        self.physical_entities = PhysicalEntitiesBase()
+        self.geometry = GeometryBase()
+        self.meshing = MeshingBase()
 
-    def read_gmsh_file(self, file, tipo, dim=2):
+    def read_gmsh_file(self, file, dim=2):
         """
         how to read the msh file here -->  http://gmsh.info/dev/doc/texinfo/gmsh.pdf
         \n
@@ -98,14 +99,14 @@ class Mesh:
             read_line = read_file[entities_idx[0] + 2 + idx].split(" ")
             self.geometry.points.point.append(int(read_line[0]))
             self.geometry.points.point_coord.append(
-                list(map(int, [read_line[1], read_line[2]]))
+                list(map(float, [read_line[1], read_line[2]]))
             )
 
         for idx in range(n_curves):
             read_line = read_file[entities_idx[0] + 2 + idx + n_points].split(" ")
             self.geometry.curves.curve_tag.append(int(read_line[0]))
             self.geometry.curves.curve_coord.append(
-                list(map(int, [coord for coord in read_line[1:7]]))
+                list(map(float, [coord for coord in read_line[1:7]]))
             )
 
             count_physical = int(read_line[7])
@@ -126,7 +127,7 @@ class Mesh:
             ].split(" ")
             self.geometry.surfaces.surfaces_tag.append(int(read_line[0]))
             self.geometry.surfaces.surfaces_coord.append(
-                list(map(int, [coord for coord in read_line[1:7]]))
+                list(map(float, [coord for coord in read_line[1:7]]))
             )
 
             count_physical = int(read_line[7])

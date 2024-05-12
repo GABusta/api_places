@@ -9,7 +9,7 @@ absolute_path = os.path.dirname(__file__)
 
 def get_coordinates_from_file(model_name: str) -> List[List[float]]:
     coordinates = []
-    boundaries_filename = f'boundaries/{model_name}.txt'
+    boundaries_filename = f'map_coordinates/boundaries/{model_name}.txt'
     with open(boundaries_filename, "r") as file:
         for line in file:
             lat, lon = line.strip().split(',')
@@ -24,7 +24,7 @@ def mesh_generation_file(model_name: str, size_element: float) -> None:
     :param model_name:
     :return:
     """
-    filename = f'map_coordinates/{model_name}.msh'
+    filename = f'map_coordinates/msh_files/{model_name}.msh'
     geom_points = get_coordinates_from_file(model_name)
 
     gmsh.initialize()
@@ -70,9 +70,7 @@ def mesh_generation_file(model_name: str, size_element: float) -> None:
     gmsh.model.mesh.setRecombine(2, 22)
     gmsh.model.mesh.generate(2)  # Unstructured Quad
     gmsh.model.mesh.optimize("QuadQuasiStructured")
-
     gmsh.option.setNumber("Mesh.SurfaceFaces", 1)  # show FE faces
-
 
     gmsh.write(filename)
     gmsh.fltk.run()
