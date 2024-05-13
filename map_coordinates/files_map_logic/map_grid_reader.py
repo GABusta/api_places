@@ -3,6 +3,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use the non-GUI Agg backend
 import matplotlib.pyplot as plt
 from files_map_logic.object_bases import PhysicalEntitiesBase, GeometryBase, MeshingBase
+import math
 import os
 
 
@@ -84,6 +85,9 @@ class Mesh:
         self.physical_entities.surfaces_number = len(
             self.physical_entities.surface_idxs
         )
+
+        self.physical_entities.contour_idxs = np.array(self.physical_entities.contour_idxs)
+        self.physical_entities.contour_tag = np.array(self.physical_entities.contour_tag)
         return self
 
     def _entities(self, read_file, entities_idx):
@@ -101,6 +105,8 @@ class Mesh:
             self.geometry.points.point_coord.append(
                 list(map(float, [read_line[1], read_line[2]]))
             )
+        self.geometry.points.point = np.array(self.geometry.points.point)
+        self.geometry.points.point_coord = np.array(self.geometry.points.point_coord)
 
         for idx in range(n_curves):
             read_line = read_file[entities_idx[0] + 2 + idx + n_points].split(" ")
@@ -120,6 +126,10 @@ class Mesh:
             self.geometry.curves.bounding_curves.append(
                 list(map(int, [curve for curve in read_line[10 : 10 + count]]))
             )
+        self.geometry.curves.curve_tag = np.array(self.geometry.curves.curve_tag)
+        self.geometry.curves.curve_coord = np.array(self.geometry.curves.curve_coord)
+        self.geometry.curves.physical_tags_number = np.array(self.geometry.curves.physical_tags_number)
+        self.geometry.curves.physical_tags = np.array(self.geometry.curves.physical_tags)
 
         for idx in range(n_surfaces):
             read_line = read_file[
@@ -140,7 +150,6 @@ class Mesh:
             self.geometry.surfaces.curves_tags.append(
                 list(map(int, [tag for tag in read_line[10 : 10 + count]]))
             )
-
         return self
 
     def _nodes(self, read_file, nodes_idx):
@@ -174,7 +183,8 @@ class Mesh:
                     list(map(float, [value for value in coordinate]))
                 )
             idx = end + nodes_in_block - 1
-
+        self.meshing.nodes_entities_tag = np.array(self.meshing.nodes_entities_tag)
+        self.meshing.nodes_coord = np.array(self.meshing.nodes_coord)
         return self
 
     def _elements(self, read_file, elements_idx):
@@ -204,5 +214,40 @@ class Mesh:
                 )
             idx += elements_in_block + 1
         self.meshing.elements_number = len(self.meshing.elements_connection)
-
+        self.meshing.elements_connection = np.array(self.meshing.elements_connection)
         return self
+    
+    @staticmethod
+    def _calculate_radius_from_degrees(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        lat_1, lon_1, lat_2, lon_2 = map(math.radians, [lat1, lon1, lat2, lon2])
+        dlat = lat_2 - lat_1
+        dlon = lon_2 - lon_1
+
+        # Haversine formula
+        R = 6371.0 * 1000 # earth radius 
+        a = math.sin(dlat / 2)**2 + math.cos(lat_1) * math.cos(lat_2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+        # Distance in meters
+        distance = ( R * c ) * 1.1
+        return distance
+
+    def calculate_and_save_centroids(self, model_name: str):
+        # lat = coords[1]
+        # lon = coords[0]
+        coords = np.array(self.meshing.nodes_coord)
+
+        with open(f'map_coordinates/centroids/centroids_{model_name}.txt', 'w') as file:
+            for element in self.meshing.elements_connection:
+                lon_center = np.mean(coords[element[1:5] - 1, 0], axis=0)
+                lat_center = np.mean(coords[element[1:5] - 1, 1], axis=0)
+
+                radius = Mesh._calculate_radius_from_degrees(
+                    lat1=lat_center,
+                    lon1=lon_center,
+                    lat2=coords[element[1] - 1, 1],
+                    lon2=coords[element[1] - 1, 0],
+                    )
+                file.write(str(lat_center) + ',')
+                file.write(str(lon_center) + ',')
+                file.write(str(radius) + '\n')

@@ -15,4 +15,4 @@ if __name__ == "__main__":
     
     mesh = Mesh()
     mesh.read_gmsh_file(f'map_coordinates/msh_files/{model_name}.msh')
-    a =1 
+    mesh.calculate_and_save_centroids(model_name)
