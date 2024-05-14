@@ -10,6 +10,7 @@ class Points:
     Methods: \n
         `__init__():`
     """
+
     def __init__(self):
         self.points_number: int = 0
         self.point: List[int] = []
@@ -19,7 +20,7 @@ class Points:
 class Curves:
     """
     Attributes: \n
-        `curves_number:` int 
+        `curves_number:` int
         `curve_tag:` List[int] \n
         `curve_coord:` \n
         `physical_tags_number:` List[int] \n
@@ -29,6 +30,7 @@ class Curves:
     Methods: \n
         `__init__():`
     """
+
     def __init__(self):
         self.curves_number: int = 0
         self.curve_tag: List[int] = []
@@ -52,6 +54,7 @@ class Surfaces:
     Methods: \n
         `__init__():`
     """
+
     def __init__(self):
         self.surfaces_number: int = 0
         self.surfaces_tag: List[int] = []
@@ -74,6 +77,7 @@ class PhysicalEntitiesBase:
     Methods: \n
         `__init__():`
     """
+
     def __init__(self):
         self.contours_number: int = 0
         self.contour_idxs: List[int] = []
@@ -92,6 +96,7 @@ class GeometryBase:
     Methods: \n
         `__init__():`
     """
+
     def __init__(self):
         self.points = Points()
         self.curves = Curves()
@@ -109,9 +114,10 @@ class MeshingBase:
     Methods: \n
         `__init__():`
     """
+
     def __init__(self):
         self.nodes_number: int = 0
         self.nodes_entities_tag: List[int] = []
         self.nodes_coord: List[List[float]] = []
-        self.elements_number: int= 0
+        self.elements_number: int = 0
         self.elements_connection: List[int] = []

@@ -16,7 +16,9 @@ def get_place_details(api_key: str, place_id: str, fields: list):
         return {}
 
 
-def find_places(api_key: str, location: str, keyword: str, extra_fields: List[str], radius: float):
+def find_places(
+    api_key: str, location: str, keyword: str, extra_fields: List[str], radius: float
+):
     endpoint_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     places = []
 
@@ -38,7 +40,6 @@ def find_places(api_key: str, location: str, keyword: str, extra_fields: List[st
             place.update(detailed_info)
             places.append(place)
 
-        # places.extend(results["results"])
         if "next_page_token" in results:
             params["pagetoken"] = results["next_page_token"]
             res = requests.get(endpoint_url, params=params)
@@ -49,25 +50,26 @@ def find_places(api_key: str, location: str, keyword: str, extra_fields: List[st
 
 def get_locations_from_centroids(model_name: str):
     centroid_coordinates = []
-    centroids = f'map_coordinates/centroids/centroids_{model_name}.txt'
+    centroids = f"map_coordinates/centroids/centroids_{model_name}.txt"
     with open(centroids, "r") as file:
         for line in file:
-            lat, lon, radius = line.strip().split(',')
-            centroid_coordinates.append([f'{lat},{lon}', float(radius)])
+            lat, lon, radius = line.strip().split(",")
+            centroid_coordinates.append([f"{lat},{lon}", float(radius)])
     return centroid_coordinates
 
 
 if __name__ == "__main__":
     api_key = os.getenv("API_KEY")
 
+    # ----- change if neccesary ----
     state = "buenos_aires"
     query = "veterinaria"
     extra_fields = ["formatted_phone_number", "website", "url", "address_component"]
+    # ------------------------------
     locations = get_locations_from_centroids(state)
     places = []
 
-    locations = locations[0:6]
-
+    # locations = locations[0:500]
     filename = f"values_found_{state.replace(' ', '_')}.csv"
     is_header = True
     with open(filename, mode="w", newline="", encoding="utf-8") as file:
@@ -78,10 +80,11 @@ if __name__ == "__main__":
                 keyword=query,
                 extra_fields=extra_fields,
                 radius=radius,
-                )
+            )
             if places_found:
                 save_to_csv(places_found, file, is_header)
-                # print(f"Data for {state} saved.")
             else:
                 print(f"No data found for {state}.")
             is_header = False
+
+    print(f"Data for {state} saved.")

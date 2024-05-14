@@ -11,8 +11,8 @@ if __name__ == "__main__":
     mesh_generation_file(
         model_name=model_name,
         size_element=size_element,
-        )
-    
+    )
+
     mesh = Mesh()
-    mesh.read_gmsh_file(f'map_coordinates/msh_files/{model_name}.msh')
+    mesh.read_gmsh_file(f"map_coordinates/msh_files/{model_name}.msh")
     mesh.calculate_and_save_centroids(model_name)

@@ -3,16 +3,17 @@ import gmsh
 import warnings
 import os
 from typing import List
+
 warnings.filterwarnings("ignore")
 absolute_path = os.path.dirname(__file__)
 
 
 def get_coordinates_from_file(model_name: str) -> List[List[float]]:
     coordinates = []
-    boundaries_filename = f'map_coordinates/boundaries/{model_name}.txt'
+    boundaries_filename = f"map_coordinates/boundaries/{model_name}.txt"
     with open(boundaries_filename, "r") as file:
         for line in file:
-            lat, lon = line.strip().split(',')
+            lat, lon = line.strip().split(",")
             coordinates.append([float(lon), float(lat)])
     return coordinates
 
@@ -24,7 +25,7 @@ def mesh_generation_file(model_name: str, size_element: float) -> None:
     :param model_name:
     :return:
     """
-    filename = f'map_coordinates/msh_files/{model_name}.msh'
+    filename = f"map_coordinates/msh_files/{model_name}.msh"
     geom_points = get_coordinates_from_file(model_name)
 
     gmsh.initialize()
@@ -61,8 +62,8 @@ def mesh_generation_file(model_name: str, size_element: float) -> None:
     # --> gmsh.model.addPhysicalGroup( Dimension, entities lists, tag)
     gmsh.model.geo.synchronize()
     for curve in curves_id:
-        gmsh.model.addPhysicalGroup(dim=1, tags=[curve], name=f'curve{curve}')
-    
+        gmsh.model.addPhysicalGroup(dim=1, tags=[curve], name=f"curve{curve}")
+
     gmsh.model.addPhysicalGroup(dim=2, tags=[22], name="surface")
     # ---Mesh
     gmsh.model.geo.synchronize()
@@ -75,4 +76,3 @@ def mesh_generation_file(model_name: str, size_element: float) -> None:
     gmsh.write(filename)
     gmsh.fltk.run()
     gmsh.finalize()
-    

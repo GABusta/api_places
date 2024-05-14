@@ -1,7 +1,7 @@
 import csv
 
 
-def save_to_csv(places, file, is_header: bool=False) -> None:
+def save_to_csv(places, file, is_header: bool = False) -> None:
     writer = csv.writer(file)
     if is_header:
         writer.writerow(
@@ -30,22 +30,22 @@ def save_to_csv(places, file, is_header: bool=False) -> None:
         lat = location.get("lat", "")
         lng = location.get("lng", "")
 
-        street_num = ''
-        street = ''
-        neighborhood = ''
-        locality = ''
-        postal_code = ''
+        street_num = ""
+        street = ""
+        neighborhood = ""
+        locality = ""
+        postal_code = ""
 
         for component in place.get("address_components", []):
-            if 'street_number' in component.get("types", []):
+            if "street_number" in component.get("types", []):
                 street_num = component.get("long_name", "")
-            elif 'route' in component.get("types", []):
+            elif "route" in component.get("types", []):
                 street = component.get("long_name", "")
-            elif 'sublocality' in component.get("types", []):
+            elif "sublocality" in component.get("types", []):
                 neighborhood = component.get("long_name", "")
-            elif 'locality' in component.get("types", []):
+            elif "locality" in component.get("types", []):
                 locality = component.get("short_name", "")
-            elif 'postal_code' in component.get("types", []):
+            elif "postal_code" in component.get("types", []):
                 postal_code = component.get("long_name", "")
 
         writer.writerow(
