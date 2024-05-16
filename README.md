@@ -1,7 +1,7 @@
 
 # Geospatial Places Finder
 
-This application queries the Google Places API to gather information about specific business queries in various locations. The results are saved in an Excel file. The center locations to make the neccesary queries are created using `gmsh` so in that way a grid of points that maps the region is provided.
+This application queries the Google Places API to gather information about specific business queries in various locations. The results are saved in a CSV file. The center locations for these queries are generated from a grid of points using `Gmsh`, which divides the region into smaller sections. These sections are then used to calculate the `centers` and the `radius` for the queries.
 
 ![Example Image](img/mesh.png)
 
