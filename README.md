@@ -19,15 +19,10 @@ This application queries the Google Places API to gather information about speci
 ## Installation
 
 1. Clone the repository:
-    `
-    git clone https://github.com/GABusta/api_places.git
-    cd geospatial-places-finder
-    `
+    `git clone https://github.com/GABusta/api_places.git`
 
 3. Install the required dependencies:
-    `
-    pip install -r requirements.txt
-    `
+    `pip install -r requirements.txt`
 
 4. Set up your Google Places API key in the environment variables:
     copy the `.env-sample` and rename it as `.env` and replace with your own key 
@@ -48,6 +43,7 @@ This application queries the Google Places API to gather information about speci
     `python main.py`
 
 3. The results will be saved in a CSV file named `values_found_{state}.csv`.
+
 
 ## Project Structure
 
